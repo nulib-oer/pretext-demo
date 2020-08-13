@@ -21,29 +21,30 @@ jobs:
     - uses: actions/checkout@v2
 
     # Runs a set of commands using the runners shell
-    - name: Install xsltproc, wget, and LaTeX
+    - name: Install xsltproc and LaTeX
       run: |
         sudo apt-get update -y
         sudo apt-get install -y xsltproc
-        sudo apt-get install wget
         sudo apt-get install texlive-latex-base
         sudo apt-get install texlive-fonts-recommended
         sudo apt-get install texlive-fonts-extra
         
-    - name: Copy XSLT files from PreTeXt for HTML and PDF outputs
+    - name: Clone PreTeXt
       run: |
-        wget https://raw.githubusercontent.com/rbeezer/mathbook/dev/xsl/pretext-html.xsl
-        wget https://raw.githubusercontent.com/rbeezer/mathbook/dev/xsl/pretext-latex.xsl
+        git clone https://github.com/rbeezer/mathbook.git
+        cd mathbook
+        git checkout dev
+        cd ..
         
     - name: Create Output Directory
       run: mkdir public
     
     - name: Process HTML
-      run: xsltproc -o public/quickstart.html pretext-html.xsl quickstart.xml
+      run: xsltproc -o public/quickstart.html ./mathbook/xsl/pretext-html.xsl quickstart.xml
     
     - name: Process LaTeX
       run: | 
-        xsltproc -o public/quick.tex pretext-latex.xsl quickstart.xml
+        xsltproc -o public/quick.tex ./mathbook/xsl/pretext-latex.xsl quickstart.xml
         pdflatex -output-directory public quick.tex
 
     - uses: maxheld83/ghpages@v0.3.0
